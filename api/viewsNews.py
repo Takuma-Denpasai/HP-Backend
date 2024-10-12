@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .constant import *
+from .permission import *
+from .inspection import *
 
 # Create your views here.
 
@@ -47,25 +49,44 @@ def oneNews(request, id):
   
   return HttpResponse(status=HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED)
 
-# ! 未対応
-# POST /news/new
+# GET /organization/[id]/news
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def organizationNews(request, id):
+  
+  if request.method == 'GET':
+    
+    if checkPermission(request.user, id, [PERMISSION_NEWS]):
+      
+      organization = request.user.organization.filter(id=id)
+      
+      news = list(NewsData.objects.filter(organization=organization.first()).values('id', 'title', 'user__username', 'news_inspections__inspected', 'news_inspections__deleted', 'created_at', 'updated_at'))
+    
+    return JsonResponse({'news': news})
+  
+  return HttpResponse(status=HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED)
+
+# POST /organization/[id]/news/new
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def newNews(request, id):
   
   if request.method == 'POST':
     
-    print(request.user.permissions__permission_type())
+    data = request.POST
     
-    news = NewsData.objects.create(
-      title=request.POST.get('title'),
-      detail=request.POST.get('detail'),
-      show_top=request.POST.get('show_top'),
-      important=request.POST.get('important'),
-      organization_id=request.POST.get('organization_id'),
-      user_id=request.user.id
-    )
+    if checkPermission(request.user, id, [PERMISSION_NEWS]):
+      
+      if 'title' in data and 'detail' in data and 'show_top' in data and 'important' in data:
+        
+        organization = request.user.organization.filter(id=id)
+        
+        news = NewsData.objects.create(title=data['title'], detail=data['detail'], show_top=data['show_top'], important=data['important'], organization=organization.first(), user=request.user)
+        
+        NewsInspectionData.objects.create(news=news)
+        
+        inspection('news', news.id)
+        
+        return JsonResponse({'news': news})
     
-    inspection = NewsInspectionData.objects.create(news_id=news.id)
-    
-    return JsonResponse({'news': news})
+    return HttpResponse(status=HTTP_RESPONSE_CODE_BAD_REQUEST)
