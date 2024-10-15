@@ -81,13 +81,13 @@ def newNews(request, id):
         
         organization = request.user.organization.filter(id=id)
         
-        news = NewsData.objects.create(title=data['title'], detail=data['detail'], show_top=data['show_top'], important=data['important'], organization=organization.first(), user=request.user)
+        news = NewsData.objects.create(title=data['title'], detail=data['detail'], show_top=data['show_top']=='true', important=data['important']=='true', organization=organization.first(), user=request.user)
         
         NewsInspectionData.objects.create(news=news)
         
         inspection('news', news.id)
         
-        return JsonResponse({'news': news})
+        return JsonResponse({'news': 'news'})
     
     return HttpResponse(status=HTTP_RESPONSE_CODE_BAD_REQUEST)
 
