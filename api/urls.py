@@ -39,6 +39,7 @@ urlpatterns = [
     path('organization/<int:id>/delete', viewsOrganization.deleteOrganization),
     path('organization/<int:id>/news', viewsNews.organizationNews),
     path('organization/<int:id>/news/new', viewsNews.newNews),
+    path('organization/<int:id>/news/<int:news_id>', viewsNews.oneOrganizationNews),
     path('organization/<int:id>/member', viewsOrganization.getOrganizationUsers),
     path('organization/<int:id>/member/new', viewsOrganization.addOrganizationUser),
     path('organization/<int:id>/member/<int:user_id>', viewsOrganization.getOrganizationUsersPermission),
