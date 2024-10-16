@@ -110,6 +110,7 @@ class ShopData(models.Model):
   detail = models.TextField()
   image = models.URLField(blank=True, null=True)
   organization = models.OneToOneField(OrganizationData, on_delete=models.CASCADE, related_name='shops')
+  user = models.ForeignKey(UserData, on_delete=models.CASCADE, related_name='shops')
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 

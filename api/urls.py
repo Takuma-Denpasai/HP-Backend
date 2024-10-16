@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from . import views, login, viewsNews, viewsOrganization
+from . import views, login, viewsNews, viewsOrganization, viewsInspection
 from rest_framework.routers import DefaultRouter
 from .login import LoginViewSet
 
@@ -36,13 +36,17 @@ urlpatterns = [
     path('organization/new', viewsOrganization.newOrganization),
     path('organization/<int:id>', viewsOrganization.getOneOrganization),
     path('organization/<int:id>/permission', viewsOrganization.organizationPermission),
+    path('organization/<int:id>/edit', viewsOrganization.editOrganization),
     path('organization/<int:id>/delete', viewsOrganization.deleteOrganization),
     path('organization/<int:id>/news', viewsNews.organizationNews),
     path('organization/<int:id>/news/new', viewsNews.newNews),
     path('organization/<int:id>/news/<int:news_id>', viewsNews.oneOrganizationNews),
+    path('organization/<int:id>/news/<int:news_id>/delete', viewsNews.deleteOrganizationNews),
     path('organization/<int:id>/member', viewsOrganization.getOrganizationUsers),
     path('organization/<int:id>/member/new', viewsOrganization.addOrganizationUser),
     path('organization/<int:id>/member/<int:user_id>', viewsOrganization.getOrganizationUsersPermission),
     path('organization/<int:id>/member/<int:user_id>/delete', viewsOrganization.deleteOrganizationUser),
     path('organization/<int:id>/member/<int:user_id>/change_owner', viewsOrganization.changeOwner),
+    path('organization/<int:id>/inspection', viewsInspection.inspection),
+    # path('organization/<int:id>/inspection/<slug:category>/<int:item_id>', viewsInspection.inspect),
 ]

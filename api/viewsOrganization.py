@@ -341,13 +341,15 @@ def organizationPermission(request, id):
   
   organization = request.user.organization.filter(id=id)
   
+  organization_permissions = list(organization.first().organization_permissions.all().order_by('-created_at').values('id', 'permission_type', 'created_at', 'organization_permission_inspection__inspected', 'organization_permission_inspection__deleted'))
+  
   if organization.exists():
     
     if request.method == "GET":
       
       permissions = list(organization.first().organization_permissions.all().values_list('permission_type', flat=True))
       
-      return JsonResponse({'permissions': permissions})
+      return JsonResponse({'permissions': permissions, 'now_permissions': organization_permissions})
     
     elif request.method == "POST":
       
@@ -364,3 +366,37 @@ def organizationPermission(request, id):
       
       return JsonResponse({'permission': list(organization_permission.values('permission_type', 'organization'))}, status=HTTP_RESPONSE_CODE_CREATED)
 
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def editOrganization(request, id):
+  
+  organization = request.user.organization.filter(id=id)
+  
+  if organization.exists():
+    
+    if request.method == "GET":
+      
+        if organization.first().owner == request.user:
+          
+          return JsonResponse({'organization': list(organization.values('id', 'name', 'owner_id'))})
+      
+    elif request.method == "POST":
+      
+      if 'name' in request.POST:
+        
+        organization.update(name=request.POST['name'])
+        
+        return JsonResponse({'organization': 'success'}, status=HTTP_RESPONSE_CODE_CREATED)
+      
+      else:
+        
+        return HttpResponse(status=HTTP_RESPONSE_CODE_BAD_REQUEST)
+  
+  if OrganizationData.objects.filter(id=id).exists():
+    
+    return HttpResponse(status=HTTP_RESPONSE_CODE_FORBIDDEN)
+  
+  else:
+    
+    return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)

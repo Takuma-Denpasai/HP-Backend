@@ -1,9 +1,9 @@
 import boto3, os
 
-def inspection(type, id):
+def inspection(type, id, allow_approve = True):
   
-  # if os.environ.get('DEBUG') == 'True':
-    # return
+  if os.environ.get('DEBUG') == 'True':
+    return
   
   SQS_URL = os.environ.get('SQS_URL')
   client = boto3.client('sqs')
@@ -14,11 +14,9 @@ def inspection(type, id):
   try:
     response = client.send_message(
       QueueUrl = SQS_URL,
-      MessageBody = formatDBName(type) + ',' + str(id)
+      MessageBody = formatDBName(type) + ',' + str(id) + ',' + str(allow_approve)
     )
-    print(response)
     return response
   
   except Exception as e:
-    print(e)
     return e

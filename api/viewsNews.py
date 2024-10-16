@@ -21,11 +21,11 @@ def allNews(request):
     
     if 'top' in request.GET:
       
-      news = list(NewsData.objects.filter(news_inspections__inspected=True, news_inspections__deleted=False, show_top=True).order_by('-created_at').values('id', 'title', 'organization__name', 'created_at'))
+      news = list(NewsData.objects.filter(news_inspections__inspected=True, news_inspections__deleted=False, show_top=True).order_by('-created_at').values('id', 'title', 'organization__name', 'user__username', 'created_at'))
     
     elif 'important' in request.GET:
       
-      news = list(NewsData.objects.filter(news_inspections__inspected=True, news_inspections__deleted=False, important=True).order_by('-created_at').values('id', 'title'))
+      news = list(NewsData.objects.filter(news_inspections__inspected=True, news_inspections__deleted=False, important=True).order_by('-created_at').values('id', 'title', 'organization__name', 'user__username'))
     
     else:
       
@@ -145,6 +145,31 @@ def oneOrganizationNews(request, id, news_id):
         NewsInspectionData.objects.filter(news=news).update(inspected=False, deleted=False, ai=False)
         
         inspection('news', news_id)
+      
+      return JsonResponse({'news': 'success'})
+    
+    return HttpResponse(status=HTTP_RESPONSE_CODE_FORBIDDEN)
+
+# POST /organization/[id]/news/[id]/delete
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def deleteOrganizationNews(request, id, news_id):
+  
+  if request.method == 'POST':
+    
+    if checkPermission(request.user, id, [PERMISSION_NEWS]):
+      
+      organization = request.user.organization.filter(id=id)
+      
+      news = NewsData.objects.filter(organization=organization.first(), id=news_id)
+      
+      if news.exists() == False:
+        return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
+      
+      else:
+        news = news.first()
+        
+        news.delete()
       
       return JsonResponse({'news': 'success'})
     
