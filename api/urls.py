@@ -48,5 +48,5 @@ urlpatterns = [
     path('organization/<int:id>/member/<int:user_id>/delete', viewsOrganization.deleteOrganizationUser),
     path('organization/<int:id>/member/<int:user_id>/change_owner', viewsOrganization.changeOwner),
     path('organization/<int:id>/inspection', viewsInspection.inspection),
-    # path('organization/<int:id>/inspection/<slug:category>/<int:item_id>', viewsInspection.inspect),
+    path('organization/<int:id>/inspection/<slug:category>/<int:item_id>', viewsInspection.inspect),
 ]
