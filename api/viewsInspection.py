@@ -72,11 +72,11 @@ def inspect(request, id, category, item_id):
       
       elif category == 'organization_permission':
         
-        organization_permission = OrganizationPermissionInspectionData.objects.filter(organization__id=item_id, ai=True, inspected=False, deleted=False)
+        organization_permission = OrganizationPermissionInspectionData.objects.filter(organization__id=item_id, inspected=False, deleted=False)
         
         if organization_permission.exists():
           
-          organization_permission.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
+          organization_permission.update(inspected=inspect_result, deleted=not inspect_result)
           return JsonResponse({'message': '組織権限が検査されました。'})
         
         return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
