@@ -25,7 +25,9 @@ def inspection(request, id):
       band = list(BandInspectionData.objects.filter(ai=True, inspected=False, deleted=False).values('band__name', 'band__user__username', 'band__organization__name', 'band__id', 'band__updated_at'))
       band_song = list(BandSongInspectionData.objects.filter(ai=True, inspected=False, deleted=False).values('song__name', 'song__band__name', 'song__id'))
       
-      return JsonResponse({'news': news, 'organization_permission': organization_permission, 'post': post, 'shop': shop, 'menu': menu, 'event': event, 'karaoke': karaoke, 'band': band, 'band_song': band_song})
+      count = len(news) + len(organization_permission) + len(post) + len(shop) + len(menu) + len(event) + len(karaoke) + len(band) + len(band_song)
+      
+      return JsonResponse({'count': count, 'news': news, 'organization_permission': organization_permission, 'post': post, 'shop': shop, 'menu': menu, 'event': event, 'karaoke': karaoke, 'band': band, 'band_song': band_song})
     
     return HttpResponse(status=HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED)
 
@@ -41,15 +43,15 @@ def inspect(request, id, category, item_id):
       if not category in ['news', 'organization_permission', 'post', 'shop', 'menu', 'event', 'karaoke', 'band', 'band_song']:
         return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
       
-      news = list(NewsInspectionData.objects.filter(news__id=item_id, ai=True, inspected=False, deleted=False).values('news__title', 'news__detail', 'news__user__username', 'news__organization__name', 'news__id', 'news__updated_at')) if category == 'news' else []
+      news = list(NewsInspectionData.objects.filter(news__id=item_id, inspected=False, deleted=False).values('news__title', 'news__detail', 'news__user__username', 'news__organization__name', 'news__id', 'news__updated_at')) if category == 'news' else []
       organization_permission = list(OrganizationPermissionInspectionData.objects.filter(organization__id=item_id, inspected=False, deleted=False).values('organization__permission_type', 'organization__organization__name', 'organization__id', 'organization__updated_at')) if category == 'organization_permission' else []
-      post = list(PostInspectionData.objects.filter(post__id=item_id, ai=True, inspected=False, deleted=False).values('post__title', 'post__detail', 'post__user__username', 'post__organization__name', 'post__id', 'post__updated_at')) if category == 'post' else []
-      shop = list(ShopInspectionData.objects.filter(shop__id=item_id, ai=True, inspected=False, deleted=False).values('shop__name', 'shop__detail', 'shop__user__username', 'shop__organization__name', 'shop__id', 'shop__updated_at')) if category == 'shop' else []
-      menu = list(MenuInspectionData.objects.filter(menu__id=item_id, ai=True, inspected=False, deleted=False).values('menu__name', 'menu__shop__name', 'menu__id', 'menu__updated_at')) if category == 'menu' else []
-      event = list(EventInspectionData.objects.filter(event__id=item_id, ai=True, inspected=False, deleted=False).values('event__title', 'event__detail', 'event__user__username', 'event__organization__name', 'event__id', 'event__updated_at')) if category == 'event' else []
-      karaoke = list(KaraokeInspectionData.objects.filter(karaoke__id=item_id, ai=True, inspected=False, deleted=False).values('karaoke__name', 'karaoke__user__username', 'karaoke__organization__name', 'karaoke__id', 'karaoke__updated_at')) if category == 'karaoke' else []
-      band = list(BandInspectionData.objects.filter(band__id=item_id, ai=True, inspected=False, deleted=False).values('band__name', 'band__user__username', 'band__organization__name', 'band__id', 'band__updated_at')) if category == 'band' else []
-      band_song = list(BandSongInspectionData.objects.filter(song__id=item_id, ai=True, inspected=False, deleted=False).values('song__name', 'song__band__name', 'song__id')) if category == 'band_song' else []
+      post = list(PostInspectionData.objects.filter(post__id=item_id, inspected=False, deleted=False).values('post__title', 'post__detail', 'post__user__username', 'post__organization__name', 'post__id', 'post__updated_at')) if category == 'post' else []
+      shop = list(ShopInspectionData.objects.filter(shop__id=item_id, inspected=False, deleted=False).values('shop__name', 'shop__detail', 'shop__user__username', 'shop__organization__name', 'shop__id', 'shop__updated_at')) if category == 'shop' else []
+      menu = list(MenuInspectionData.objects.filter(menu__id=item_id, inspected=False, deleted=False).values('menu__name', 'menu__shop__name', 'menu__id', 'menu__updated_at')) if category == 'menu' else []
+      event = list(EventInspectionData.objects.filter(event__id=item_id, inspected=False, deleted=False).values('event__title', 'event__detail', 'event__user__username', 'event__organization__name', 'event__id', 'event__updated_at')) if category == 'event' else []
+      karaoke = list(KaraokeInspectionData.objects.filter(karaoke__id=item_id, inspected=False, deleted=False).values('karaoke__name', 'karaoke__user__username', 'karaoke__organization__name', 'karaoke__id', 'karaoke__updated_at')) if category == 'karaoke' else []
+      band = list(BandInspectionData.objects.filter(band__id=item_id, inspected=False, deleted=False).values('band__name', 'band__user__username', 'band__organization__name', 'band__id', 'band__updated_at')) if category == 'band' else []
+      band_song = list(BandSongInspectionData.objects.filter(song__id=item_id, inspected=False, deleted=False).values('song__name', 'song__band__name', 'song__id')) if category == 'band_song' else []
       
       count = len(news) + len(organization_permission) + len(post) + len(shop) + len(menu) + len(event) + len(karaoke) + len(band) + len(band_song)
       
