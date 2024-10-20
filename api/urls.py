@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from . import views, login, viewsNews, viewsOrganization, viewsInspection
+from . import views, login, viewsNews, viewsOrganization, viewsInspection, viewsEvent
 from rest_framework.routers import DefaultRouter
 from .login import LoginViewSet
 
@@ -32,6 +32,8 @@ urlpatterns = [
     path('register', views.UserRegistrationView.as_view()),
     path('news', viewsNews.allNews),
     path('news/<int:id>', viewsNews.oneNews),
+    path('event', viewsEvent.allEvent),
+    path('event/<int:id>', viewsEvent.oneEvent),
     path('organization', viewsOrganization.getOrganization),
     path('organization/new', viewsOrganization.newOrganization),
     path('organization/<int:id>', viewsOrganization.getOneOrganization),
@@ -42,6 +44,10 @@ urlpatterns = [
     path('organization/<int:id>/news/new', viewsNews.newNews),
     path('organization/<int:id>/news/<int:news_id>', viewsNews.oneOrganizationNews),
     path('organization/<int:id>/news/<int:news_id>/delete', viewsNews.deleteOrganizationNews),
+    path('organization/<int:id>/event', viewsEvent.organizationEvent),
+    path('organization/<int:id>/event/new', viewsEvent.newEvent),
+    path('organization/<int:id>/event/<int:event_id>', viewsEvent.oneOrganizationEvent),
+    path('organization/<int:id>/event/<int:event_id>/delete', viewsEvent.deleteOrganizationEvent),
     path('organization/<int:id>/member', viewsOrganization.getOrganizationUsers),
     path('organization/<int:id>/member/new', viewsOrganization.addOrganizationUser),
     path('organization/<int:id>/member/<int:user_id>', viewsOrganization.getOrganizationUsersPermission),
