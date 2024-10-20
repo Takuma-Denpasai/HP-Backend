@@ -30,6 +30,7 @@ urlpatterns = [
     path('healthcheck', views.healthcheck),
     path('login', login.LoginViewSet.as_view({'post': 'login'})),
     path('register', views.UserRegistrationView.as_view()),
+    path('image', views.saveImage),
     path('news', viewsNews.allNews),
     path('news/<int:id>', viewsNews.oneNews),
     path('event', viewsEvent.allEvent),

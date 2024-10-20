@@ -55,6 +55,11 @@ class PermissionData(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
+class ImageData(models.Model):
+  image = models.URLField()
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
 class NewsData(models.Model):
   title = models.CharField(max_length=100)
   detail = models.TextField()
@@ -66,7 +71,7 @@ class NewsData(models.Model):
   updated_at = models.DateTimeField(auto_now=True)
 
 class NewsImageData(models.Model):
-  image = models.URLField()
+  image = models.ForeignKey(ImageData, on_delete=models.CASCADE, related_name='news_images')
   news = models.ForeignKey(NewsData, on_delete=models.CASCADE, related_name='images')
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
@@ -91,7 +96,7 @@ class EventData(models.Model):
   updated_at = models.DateTimeField(auto_now=True)
 
 class EventImageData(models.Model):
-  image = models.URLField()
+  image = models.ForeignKey(ImageData, on_delete=models.CASCADE, related_name='event_images')
   event = models.ForeignKey(EventData, on_delete=models.CASCADE, related_name='images')
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
@@ -115,7 +120,7 @@ class ShopData(models.Model):
   updated_at = models.DateTimeField(auto_now=True)
 
 class ShopImageData(models.Model):
-  image = models.URLField()
+  image = models.ForeignKey(ImageData, on_delete=models.CASCADE, related_name='shop_images')
   shop = models.ForeignKey(ShopData, on_delete=models.CASCADE, related_name='images')
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
@@ -155,7 +160,7 @@ class PostData(models.Model):
   updated_at = models.DateTimeField(auto_now=True)
 
 class PostImageData(models.Model):
-  image = models.URLField()
+  image = models.ForeignKey(ImageData, on_delete=models.CASCADE, related_name='post_images')
   post = models.ForeignKey(PostData, on_delete=models.CASCADE, related_name='images')
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)

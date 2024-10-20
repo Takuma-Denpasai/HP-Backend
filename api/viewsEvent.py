@@ -5,7 +5,7 @@ from .models import *
 from .constant import *
 from .permission import *
 from .inspection import *
-import datetime
+import datetime, json
 
 # Create your views here.
 JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
@@ -38,10 +38,11 @@ def oneEvent(request, id):
   if request.method == 'GET':
     
     event = list(EventData.objects.filter(event_inspection__inspected=True, event_inspection__deleted=False, id=id).values('id', 'title', 'place', 'detail', 'start', 'end', 'organization__name', 'user__username'))
+    image = list(EventImageData.objects.filter(event__id=id).values_list('image__image', flat=True))
     
     if len(event) == 0:
       return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
-    return JsonResponse({'event': event, 'now': now})
+    return JsonResponse({'event': event, 'now': now, 'image': image})
   
   return HttpResponse(status=HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED)
 
@@ -69,7 +70,9 @@ def newEvent(request, id):
   
   if request.method == 'POST':
     
-    data = request.POST
+    data = json.loads(request.body)
+    image_urls = data.get('imageUrls', [])
+    print(data)
     
     if checkPermission(request.user, id, [PERMISSION_EVENT]):
       
@@ -81,7 +84,18 @@ def newEvent(request, id):
         
         EventInspectionData.objects.create(event=event)
         
-        inspection('event', event.id)
+        add_photo = False
+        for image in image_urls:
+          if image != '':
+            if EventImageData.objects.filter(event=event, image__image=image).exists() == False:
+              add_photo = True
+              image_data = ImageData.objects.filter(image=image)
+              EventImageData.objects.create(event=event, image=image_data.first())
+        
+        if add_photo:
+          inspection('event', event.id, False)
+        else:
+          inspection('event', event.id)
         
         return JsonResponse({'event': 'event'})
     
@@ -99,17 +113,19 @@ def oneOrganizationEvent(request, id, event_id):
       organization = request.user.organization.filter(id=id)
       
       event = list(EventData.objects.filter(organization=organization.first(), id=event_id).values('id', 'title', 'place', 'detail', 'start', 'end', 'organization__name', 'user__username', 'created_at', 'updated_at'))
+      image = list(EventImageData.objects.filter(event__id=event_id).values_list('image__image', flat=True))
       
       if len(event) == 0:
         return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
       
-      return JsonResponse({'event': event})
+      return JsonResponse({'event': event, 'image': image})
     
     return HttpResponse(status=HTTP_RESPONSE_CODE_FORBIDDEN)
   
   elif request.method == 'POST':
     
-    data = request.POST
+    data = json.loads(request.body)
+    image_urls = data.get('imageUrls', [])
     
     if checkPermission(request.user, id, [PERMISSION_EVENT]):
       
@@ -136,7 +152,24 @@ def oneOrganizationEvent(request, id, event_id):
         
         EventInspectionData.objects.filter(event=event).update(inspected=False, deleted=False, ai=False)
         
-        inspection('event', event_id)
+        add_photo = False
+        before_images = list(EventImageData.objects.filter(event=event).values_list('image__image', flat=True))
+        for image in image_urls:
+          if image != '':
+            if image in before_images:
+              before_images.remove(image)
+            if EventImageData.objects.filter(event=event, image__image=image).exists() == False:
+              add_photo = True
+              image_data = ImageData.objects.filter(image=image)
+              EventImageData.objects.create(event=event, image=image_data.first())
+        
+        for before_image in before_images:
+          EventImageData.objects.filter(event=event, image__image=before_image).delete()
+        
+        if add_photo:
+          inspection('event', event_id, False)
+        else:
+          inspection('event', event_id)
       
       return JsonResponse({'event': 'success'})
     

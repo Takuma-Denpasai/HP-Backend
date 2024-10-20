@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .constant import *
 from .permission import *
+import json
 
 # Create your views here.
 
@@ -55,11 +56,22 @@ def inspect(request, id, category, item_id):
       
       count = len(news) + len(organization_permission) + len(post) + len(shop) + len(menu) + len(event) + len(karaoke) + len(band) + len(band_song)
       
-      return JsonResponse({'count': count, 'news': news, 'organization_permission': organization_permission, 'post': post, 'shop': shop, 'menu': menu, 'event': event, 'karaoke': karaoke, 'band': band, 'band_song': band_song})
+      if len(news) != 0:
+        image = list(NewsImageData.objects.filter(news__id=item_id).values_list('image__image', flat=True))
+      elif len(shop) != 0:
+        image = list(ShopImageData.objects.filter(shop__id=item_id).values_list('image__image', flat=True))
+      elif len(event) != 0:
+        image = list(EventImageData.objects.filter(event__id=item_id).values_list('image__image', flat=True))
+      else:
+        image = []
+      
+      return JsonResponse({'count': count, 'news': news, 'organization_permission': organization_permission, 'post': post, 'shop': shop, 'menu': menu, 'event': event, 'karaoke': karaoke, 'band': band, 'band_song': band_song, 'image': image})
     
     elif request.method == 'POST':
       
-      inspect_result = request.POST['approve'] == 'true'
+      data = json.loads(request.body)
+      
+      inspect_result = data['approve'] == 'true'
       
       if category == 'news':
         

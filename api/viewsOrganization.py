@@ -6,6 +6,7 @@ from .permission import checkPermission
 from .constant import *
 from .status import *
 from .models import *
+import json
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -55,14 +56,16 @@ def getOneOrganization(request, id):
 @permission_classes([IsAuthenticated])
 def newOrganization(request):
   
+  data = json.loads(request.body)
+  
   if request.method == 'POST':
     
-    if not 'name' in request.POST:
+    if not 'name' in data:
       
       return HttpResponse(status=HTTP_RESPONSE_CODE_BAD_REQUEST)
     
     organization = OrganizationData.objects.create(
-      name=request.POST['name'],
+      name=data['name'],
       owner=request.user
     )
     
@@ -162,6 +165,8 @@ def getOrganizationUsersPermission(request, id, user_id):
   
   elif request.method == 'POST':
     
+    data = json.loads(request.body)
+    
     if checkPermission(request.user, id, ['admin', 'invite_user']):
       
       organization = request.user.organization.filter(id=id)
@@ -172,7 +177,7 @@ def getOrganizationUsersPermission(request, id, user_id):
         
         if user.exists():
           
-          after_permission = request.POST['permissions'].split(',')
+          after_permission = data['permissions']
           
           before_permission = user.first().permissions.filter(organization=organization.first())
           before_permission_list = list(before_permission.values_list('permission_type', flat=True))
@@ -224,11 +229,13 @@ def addOrganizationUser(request, id):
   
   if request.method == 'POST':
     
+    data = json.loads(request.body)
+    
     organization = request.user.organization.filter(id=id)
     
     if checkPermission(request.user, id, ['admin', 'invite_user']) and organization.exists():
       
-      new_user = request.POST['username']
+      new_user = data['username']
       
       user = UserData.objects.filter(username=new_user)
       
@@ -340,6 +347,7 @@ def deleteOrganization(request, id):
 def organizationPermission(request, id):
   
   organization = request.user.organization.filter(id=id)
+  data = json.loads(request.body)
   
   organization_permissions = list(organization.first().organization_permissions.all().order_by('-created_at').values('id', 'permission_type', 'created_at', 'organization_permission_inspection__inspected', 'organization_permission_inspection__deleted'))
   
@@ -353,7 +361,7 @@ def organizationPermission(request, id):
     
     elif request.method == "POST":
       
-      permission = request.POST['permission']
+      permission = data['permission']
       
       organization_permission = OrganizationPermissionData.objects.create(
         permission_type=permission,
@@ -372,6 +380,7 @@ def organizationPermission(request, id):
 def editOrganization(request, id):
   
   organization = request.user.organization.filter(id=id)
+  data = json.loads(request.body)
   
   if organization.exists():
     
@@ -383,9 +392,9 @@ def editOrganization(request, id):
       
     elif request.method == "POST":
       
-      if 'name' in request.POST:
+      if 'name' in data:
         
-        organization.update(name=request.POST['name'])
+        organization.update(name=data['name'])
         
         return JsonResponse({'organization': 'success'}, status=HTTP_RESPONSE_CODE_CREATED)
       

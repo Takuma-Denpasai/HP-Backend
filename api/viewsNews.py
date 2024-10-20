@@ -5,6 +5,7 @@ from .models import *
 from .constant import *
 from .permission import *
 from .inspection import *
+import json
 
 # Create your views here.
 
@@ -42,10 +43,11 @@ def oneNews(request, id):
   if request.method == 'GET':
     
     news = list(NewsData.objects.filter(news_inspections__inspected=True, news_inspections__deleted=False, id=id).values('id', 'title', 'detail', 'show_top', 'important', 'organization__name', 'user__username', 'created_at', 'updated_at'))
+    image = list(NewsImageData.objects.filter(news__id=id).values_list('image__image', flat=True))
     
     if len(news) == 0:
       return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
-    return JsonResponse({'news': news})
+    return JsonResponse({'news': news, 'image': image})
   
   return HttpResponse(status=HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED)
 
@@ -73,7 +75,8 @@ def newNews(request, id):
   
   if request.method == 'POST':
     
-    data = request.POST
+    data = json.loads(request.body)
+    image_urls = data.get('imageUrls', [])
     
     if checkPermission(request.user, id, [PERMISSION_NEWS]):
       
@@ -85,7 +88,18 @@ def newNews(request, id):
         
         NewsInspectionData.objects.create(news=news)
         
-        inspection('news', news.id)
+        add_photo = False
+        for image in list(image_urls):
+          if image != '':
+            if NewsImageData.objects.filter(news=news, image__image=image).exists() == False:
+              add_photo = True
+              image_data = ImageData.objects.filter(image=image)
+              NewsImageData.objects.create(news=news, image=image_data.first())
+        
+        if add_photo:
+          inspection('news', news.id, False)
+        else:
+          inspection('news', news.id)
         
         return JsonResponse({'news': 'news'})
     
@@ -103,22 +117,24 @@ def oneOrganizationNews(request, id, news_id):
       organization = request.user.organization.filter(id=id)
       
       news = list(NewsData.objects.filter(organization=organization.first(), id=news_id).values('id', 'title', 'detail', 'show_top', 'important', 'organization__name', 'user__username', 'created_at', 'updated_at'))
+      image = list(NewsImageData.objects.filter(news__id=news_id).values_list('image__image', flat=True))
       
       if len(news) == 0:
         return HttpResponse(status=HTTP_RESPONSE_CODE_NOT_FOUND)
       
-      return JsonResponse({'news': news})
+      return JsonResponse({'news': news, 'image': image})
     
     return HttpResponse(status=HTTP_RESPONSE_CODE_FORBIDDEN)
   
   elif request.method == 'POST':
     
-    data = request.POST
+    data = json.loads(request.body)
     print(data)
     
     if checkPermission(request.user, id, [PERMISSION_NEWS]):
       
       organization = request.user.organization.filter(id=id)
+      image_urls = data.get('imageUrls', [])
       
       news = NewsData.objects.filter(organization=organization.first(), id=news_id)
       
@@ -144,7 +160,24 @@ def oneOrganizationNews(request, id, news_id):
         
         NewsInspectionData.objects.filter(news=news).update(inspected=False, deleted=False, ai=False)
         
-        inspection('news', news_id)
+        add_photo = False
+        before_images = list(NewsImageData.objects.filter(news=news).values_list('image__image', flat=True))
+        for image in list(image_urls):
+          if image != '':
+            if image in before_images:
+              before_images.remove(image)
+            if NewsImageData.objects.filter(news=news, image__image=image).exists() == False:
+              add_photo = True
+              image_data = ImageData.objects.filter(image=image)
+              NewsImageData.objects.create(news=news, image=image_data.first())
+        
+        for before_image in before_images:
+          NewsImageData.objects.filter(news=news, image__image=before_image).delete()
+        
+        if add_photo:
+          inspection('news', news_id, False)
+        else:
+          inspection('news', news_id)
       
       return JsonResponse({'news': 'success'})
     
