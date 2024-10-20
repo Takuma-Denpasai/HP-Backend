@@ -150,6 +150,7 @@ def oneOrganizationEvent(request, id, event_id):
         else:
           event.save()
         
+        now_approve = EventInspectionData.objects.filter(event=event).first().inspected
         EventInspectionData.objects.filter(event=event).update(inspected=False, deleted=False, ai=False)
         
         add_photo = False
@@ -166,7 +167,7 @@ def oneOrganizationEvent(request, id, event_id):
         for before_image in before_images:
           EventImageData.objects.filter(event=event, image__image=before_image).delete()
         
-        if add_photo:
+        if add_photo or not now_approve:
           inspection('event', event_id, False)
         else:
           inspection('event', event_id)

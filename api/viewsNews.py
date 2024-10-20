@@ -158,6 +158,7 @@ def oneOrganizationNews(request, id, news_id):
         
         news.save()
         
+        now_approve = NewsInspectionData.objects.filter(news=news).first().inspected
         NewsInspectionData.objects.filter(news=news).update(inspected=False, deleted=False, ai=False)
         
         add_photo = False
@@ -174,7 +175,7 @@ def oneOrganizationNews(request, id, news_id):
         for before_image in before_images:
           NewsImageData.objects.filter(news=news, image__image=before_image).delete()
         
-        if add_photo:
+        if add_photo or not now_approve:
           inspection('news', news_id, False)
         else:
           inspection('news', news_id)

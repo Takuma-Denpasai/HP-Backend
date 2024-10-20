@@ -2,11 +2,11 @@ import boto3, os
 
 def inspection(type, id, allow_approve = True):
   
-  if os.environ.get('DEBUG') == 'True':
-    return
+  # if os.environ.get('DEBUG') == 'True':
+  #   return
   
   AWS_SQS_URL = os.environ.get('AWS_SQS_URL')
-  client = boto3.client('sqs')
+  # client = boto3.client('sqs')
   
   def formatDBName(type):
     return type.lower()
