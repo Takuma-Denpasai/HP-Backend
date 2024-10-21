@@ -71,7 +71,7 @@ def inspect(request, id, category, item_id):
       
       data = json.loads(request.body)
       
-      inspect_result = data['approve'] == 'true'
+      inspect_result = data['approve']
       
       if category == 'news':
         
