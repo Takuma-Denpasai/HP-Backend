@@ -347,7 +347,6 @@ def deleteOrganization(request, id):
 def organizationPermission(request, id):
   
   organization = request.user.organization.filter(id=id)
-  data = json.loads(request.body)
   
   organization_permissions = list(organization.first().organization_permissions.all().order_by('-created_at').values('id', 'permission_type', 'created_at', 'organization_permission_inspection__inspected', 'organization_permission_inspection__deleted'))
   
@@ -360,6 +359,8 @@ def organizationPermission(request, id):
       return JsonResponse({'permissions': permissions, 'now_permissions': organization_permissions})
     
     elif request.method == "POST":
+      
+      data = json.loads(request.body)
       
       permission = data['permission']
       
