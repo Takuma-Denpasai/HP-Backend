@@ -381,7 +381,6 @@ def organizationPermission(request, id):
 def editOrganization(request, id):
   
   organization = request.user.organization.filter(id=id)
-  data = json.loads(request.body)
   
   if organization.exists():
     
@@ -392,6 +391,8 @@ def editOrganization(request, id):
           return JsonResponse({'organization': list(organization.values('id', 'name', 'owner_id'))})
       
     elif request.method == "POST":
+      
+      data = json.loads(request.body)
       
       if 'name' in data:
         
