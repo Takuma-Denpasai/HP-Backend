@@ -1,6 +1,6 @@
 import boto3, os
 
-def inspection(type, id, allow_approve = True):
+def send_mail(to, subject, message):
   
   if os.environ.get('DEBUG') == 'True':
     return
@@ -8,13 +8,10 @@ def inspection(type, id, allow_approve = True):
   AWS_SQS_URL = os.environ.get('AWS_MAIL_SQS_URL')
   client = boto3.client('sqs')
   
-  def formatDBName(type):
-    return type.lower()
-  
   try:
     response = client.send_message(
       QueueUrl = AWS_SQS_URL,
-      MessageBody = formatDBName(type) + ',' + str(id) + ',' + str(allow_approve)
+      MessageBody = f'{to},{subject},{message}'
     )
     return response
   
