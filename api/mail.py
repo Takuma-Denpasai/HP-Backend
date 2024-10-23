@@ -5,7 +5,7 @@ def inspection(type, id, allow_approve = True):
   if os.environ.get('DEBUG') == 'True':
     return
   
-  AWS_SQS_URL = os.environ.get('AWS_INSPECTION_SQS_URL')
+  AWS_SQS_URL = os.environ.get('AWS_MAIL_SQS_URL')
   client = boto3.client('sqs')
   
   def formatDBName(type):
