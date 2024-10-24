@@ -10,7 +10,7 @@ services:
         source: socket
         target: /var/run/gunicorn
     ports:
-      - "80:80"
+      - "8000:80"
     depends_on:
       - app
 

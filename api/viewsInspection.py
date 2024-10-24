@@ -85,6 +85,11 @@ def inspect(request, id, category, item_id):
         
         if news.exists():
           
+          if inspect_result:
+            send_mail(news.news.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(news.news.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
+          
           news.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
           return JsonResponse({'message': 'ニュースが検査されました。'})
         
@@ -95,6 +100,11 @@ def inspect(request, id, category, item_id):
         organization_permission = OrganizationPermissionInspectionData.objects.filter(organization__id=item_id, inspected=False, deleted=False)
         
         if organization_permission.exists():
+          
+          if inspect_result:
+            send_mail(organization_permission.organization.organization.owner.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(organization_permission.organization.organization.owner.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
           
           organization_permission.update(inspected=inspect_result, deleted=not inspect_result)
           return JsonResponse({'message': '組織権限が検査されました。'})
@@ -107,6 +117,11 @@ def inspect(request, id, category, item_id):
         
         if post.exists():
           
+          if inspect_result:
+            send_mail(post.post.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(post.post.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
+          
           post.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
           return JsonResponse({'message': '投稿が検査されました。'})
         
@@ -117,6 +132,11 @@ def inspect(request, id, category, item_id):
         shop = ShopInspectionData.objects.filter(shop__id=item_id)
         
         if shop.exists():
+          
+          if inspect_result:
+            send_mail(shop.shop.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(shop.shop.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
           
           shop.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
           return JsonResponse({'message': '店舗が検査されました。'})
@@ -129,6 +149,11 @@ def inspect(request, id, category, item_id):
         
         if menu.exists():
           
+          if inspect_result:
+            send_mail(menu.menu.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(menu.menu.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
+          
           menu.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
           return JsonResponse({'message': 'メニューが検査されました。'})
         
@@ -139,6 +164,11 @@ def inspect(request, id, category, item_id):
         event = EventInspectionData.objects.filter(event__id=item_id)
         
         if event.exists():
+          
+          if inspect_result:
+            send_mail(event.event.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+          else:
+            send_mail(event.event.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
           
           event.update(inspected=inspect_result, user=request.user, deleted=not inspect_result, ai=False)
           return JsonResponse({'message': 'イベントが検査されました。'})
