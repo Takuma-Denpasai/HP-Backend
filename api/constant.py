@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, timedelta
-import os
+import os, random, string
 JST = timezone(timedelta(hours=+9), 'JST')
 
 PERMISSION_ADMIN = 'admin'
@@ -63,3 +63,6 @@ def INSPECTION_REJECT_MAIL(data_type, detail):
 
 {url}
 '''
+
+def randomString(n = 30):
+  return ''.join([random.choice(string.ascii_letters + string.digits) for _ in range(n)])

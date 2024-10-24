@@ -19,4 +19,5 @@ def inspection(type, id, allow_approve = True):
     return response
   
   except Exception as e:
+    print(e)
     return e
