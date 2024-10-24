@@ -33,7 +33,7 @@ def send_mail(request, subject, message):
   try:
     response = client.send_message(
       QueueUrl = AWS_SQS_URL,
-      MessageBody = f'{request.email},{subject_template(subject)},{body_template(request.username, message)}'
+      MessageBody = f'{request.email},{subject_template(subject)},{body_template(request, message)}'
     )
     return response
   
