@@ -97,7 +97,7 @@ def inspect(request, id, category, item_id):
       
       elif category == 'organization_permission':
         
-        organization_permission = OrganizationPermissionInspectionData.objects.filter(organization__id=item_id, inspected=False, deleted=False)
+        organization_permission = OrganizationPermissionInspectionData.objects.filter(organization__id=item_id)
         
         if organization_permission.exists():
           
