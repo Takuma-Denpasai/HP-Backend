@@ -6,6 +6,7 @@ from .permission import checkPermission
 from .constant import *
 from .status import *
 from .models import *
+from .mail import *
 import json
 
 @api_view(['GET'])

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .constant import *
 from .permission import *
+from .mail import *
 import json
 
 # Create your views here.
@@ -72,6 +73,11 @@ def inspect(request, id, category, item_id):
       data = json.loads(request.body)
       
       inspect_result = data['approve']
+      
+      if inspect_result:
+        send_mail(request.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+      else:
+        send_mail(request.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
       
       if category == 'news':
         

@@ -1,3 +1,7 @@
+from datetime import datetime, timezone, timedelta
+import os
+JST = timezone(timedelta(hours=+9), 'JST')
+
 PERMISSION_ADMIN = 'admin'
 PERMISSION_SHOP = 'shop'
 PERMISSION_NEWS = 'news'
@@ -16,3 +20,46 @@ HTTP_RESPONSE_CODE_FORBIDDEN = 403
 HTTP_RESPONSE_CODE_NOT_FOUND = 404
 HTTP_RESPONSE_CODE_METHOD_NOT_ALLOWED = 405
 
+def INSPECTION_APPROVE_MAIL(data_type, detail):
+  
+  if data_type == 'organization':
+    url = f'{os.environ.get('FRONTEND_HOSTS')}/organization/{detail}/permission'
+  else:
+    url = f'{os.environ.get('FRONTEND_HOSTS')}/organization?next=/{data_type}/{detail}'
+  
+  return f'''
+ユーザーから送信された内容が検証にて承認されましたことをご連絡いたします。
+
+■検証日時
+　{datetime.now(JST).strftime('%Y/%m/%d %H:%M:%S')}
+
+■データタイプ
+　{data_type}
+
+■データID
+　{detail}
+
+{url}
+'''
+
+def INSPECTION_REJECT_MAIL(data_type, detail):
+  
+  if data_type == 'organization':
+    url = f'{os.environ.get('FRONTEND_HOSTS')}/organization/{detail}/permission'
+  else:
+    url = f'{os.environ.get('FRONTEND_HOSTS')}/organization?next=/{data_type}/{detail}'
+  
+  return f'''
+ユーザーから送信された内容が検証にて承認されましたことをご連絡いたします。
+
+■検証日時
+　{datetime.now(JST).strftime('%Y/%m/%d %H:%M:%S')}
+
+■データタイプ
+　{data_type}
+
+■データID
+　{detail}
+
+{url}
+'''
