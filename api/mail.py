@@ -5,9 +5,9 @@ def subject_template(text):
     return f'電波祭実行委員会'
   return f'{text}【電波祭実行委員会】'
 
-def body_template(user, organization, text):
+def body_template(user, text):
   return f'''
-{user.username} ({organization.name}) 様
+{user.username} 様
 
 {text}
 
@@ -22,7 +22,7 @@ https://denpafest.com
 ---------------------------------
 '''
 
-def send_mail(to, subject, message):
+def send_mail(request, subject, message):
   
   if os.environ.get('DEBUG') == 'True':
     return
@@ -33,7 +33,7 @@ def send_mail(to, subject, message):
   try:
     response = client.send_message(
       QueueUrl = AWS_SQS_URL,
-      MessageBody = f'{to},{subject_template(subject)},{body_template(message)}'
+      MessageBody = f'{request.email},{subject_template(subject)},{body_template(request.username, message)}'
     )
     return response
   

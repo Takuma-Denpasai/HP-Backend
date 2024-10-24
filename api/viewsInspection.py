@@ -75,9 +75,9 @@ def inspect(request, id, category, item_id):
       inspect_result = data['approve']
       
       if inspect_result:
-        send_mail(request.user.email, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
+        send_mail(request.user, '検証結果についてのお知らせ', INSPECTION_APPROVE_MAIL(category, item_id))
       else:
-        send_mail(request.user.email, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
+        send_mail(request.user, '検証結果についてのお知らせ', INSPECTION_REJECT_MAIL(category, item_id))
       
       if category == 'news':
         
