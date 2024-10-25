@@ -50,7 +50,7 @@ def INSPECTION_REJECT_MAIL(data_type, detail):
     url = f'{os.environ.get('FRONTEND_HOSTS')}/organization?next=/{data_type}/{detail}'
   
   return f'''
-ユーザーから送信された内容が検証にて承認されましたことをご連絡いたします。
+ユーザーから送信された内容が検証にて否認されましたことをご連絡いたします。
 
 ■検証日時
 　{datetime.now(JST).strftime('%Y/%m/%d %H:%M:%S')}
