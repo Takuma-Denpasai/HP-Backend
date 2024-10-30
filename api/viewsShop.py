@@ -149,7 +149,7 @@ def oneOrganizationShop(request, id, shop_id):
         
         add_photo = False
         before_images = list(ShopImageData.objects.filter(shop=shop).values_list('image__image', flat=True))
-        for image in image_urls:
+        for index, image in enumerate(image_urls):
           if image != '':
             if image in before_images:
               before_images.remove(image)
@@ -157,6 +157,9 @@ def oneOrganizationShop(request, id, shop_id):
               add_photo = True
               image_data = ImageData.objects.filter(image=image)
               ShopImageData.objects.create(shop=shop, image=image_data.first())
+            if index == 0:
+              shop.image = ShopImageData.objects.filter(shop=shop, image__image=image).first()
+              shop.save()
         
         del_menu = list(MenuData.objects.filter(shop=shop).values_list('id', flat=True))
         
@@ -171,10 +174,6 @@ def oneOrganizationShop(request, id, shop_id):
             menu_obj = MenuData.objects.create(shop=shop, name=menu['name'], price=menu['price'], user=request.user)
             MenuInspectionData.objects.create(menu=menu_obj)
           inspection('menu', menu_obj.id)
-        
-        if len(menus) != 0:
-          shop.image = ShopImageData.objects.filter(shop=shop, image__image=menus[0]).first()
-          shop.save()
         
         for del_id in del_menu:
           MenuData.objects.filter(shop=shop, id=del_id).delete()
