@@ -84,7 +84,7 @@ def newNews(request, id):
         
         organization = request.user.organization.filter(id=id)
         
-        news = NewsData.objects.create(title=data['title'], detail=data['detail'], show_top=data['show_top']=='true', important=data['important']=='true', organization=organization.first(), user=request.user)
+        news = NewsData.objects.create(title=data['title'], detail=data['detail'], show_top=data['show_top'], important=data['important'], organization=organization.first(), user=request.user)
         
         NewsInspectionData.objects.create(news=news)
         
@@ -151,10 +151,10 @@ def oneOrganizationNews(request, id, news_id):
           news.detail=data['detail']
         
         if 'show_top' in data:
-          news.show_top=data['show_top']=='true'
+          news.show_top=data['show_top']
         
         if 'important' in data:
-          news.important=data['important']=='true'
+          news.important=data['important']
         
         news.save()
         
