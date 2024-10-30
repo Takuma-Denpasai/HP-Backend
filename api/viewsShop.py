@@ -141,7 +141,6 @@ def oneOrganizationShop(request, id, shop_id):
         shop.name=data['name']
         shop.detail=data['detail']
         shop.address=data['address']
-        shop.image=image
         
         shop.save()
         
